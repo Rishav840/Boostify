@@ -1,0 +1,14 @@
+{%- assign cfg = app.metafields.boostify.announcement.value -%}
+{%- if cfg != blank -%}
+  <script type="application/json" data-boostify-config data-mode="embed" data-page="{{ request.page_type }}">{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'announcement-bar.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'announcement-bar.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Announcement Bar",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

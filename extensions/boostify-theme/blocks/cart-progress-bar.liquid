@@ -1,0 +1,25 @@
+{%- assign cfg = app.metafields.boostify.cart_progress.value -%}
+{%- if cfg != blank and cfg.enabled == true -%}
+  <div class="boostify-cp-slot" {{ block.shopify_attributes }}></div>
+  <script
+    type="application/json"
+    data-boostify-cp
+    data-total="{{ cart.total_price }}"
+    data-money-format="{{ shop.money_format | escape }}"
+    data-shop-currency="{{ shop.currency }}"
+  >{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'cart-progress.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'cart-progress.js' | asset_url }}" defer></script>
+{%- else -%}
+  <div {{ block.shopify_attributes }} style="padding:12px;text-align:center;font-size:14px;">
+    Turn on the Cart Progress Bar in the Boostify app first.
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Progress Bar",
+  "target": "section",
+  "settings": []
+}
+{% endschema %}

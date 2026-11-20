@@ -1,0 +1,198 @@
+/* Wrapper: gives boxed/pill bars breathing room; transparent so the page shows around them */
+.boostify-ab-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--bab-inset, 0px);
+  position: relative;
+  z-index: 50;
+}
+.boostify-ab-wrap--sticky { position: sticky; top: 0; }
+
+.boostify-ab {
+  --bab-bg: #111111;
+  --bab-from: #111111;
+  --bab-text: #ffffff;
+  --bab-accent: #ffd24a;
+  --bab-btn-bg: #ffffff;
+  --bab-btn-text: #111111;
+  --bab-btn-radius: 999px;
+  --bab-radius: 0px;
+  --bab-font: inherit;
+  --bab-size: 14px;
+  --bab-weight: 600;
+  --bab-space: 0.5px;
+  --bab-pad: 11px;
+  --bab-align: center;
+  --bab-speed: 25s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--bab-bg);
+  color: var(--bab-text);
+  border-radius: var(--bab-radius);
+  font-family: var(--bab-font);
+  font-size: var(--bab-size);
+  font-weight: var(--bab-weight);
+  letter-spacing: var(--bab-space);
+  line-height: 1.35;
+}
+.boostify-ab[hidden],
+.boostify-ab-wrap[hidden] { display: none; }
+.boostify-ab--border { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.boostify-ab--shadow { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18); }
+.boostify-ab--border.boostify-ab--shadow {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12), 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+.boostify-ab--upper .boostify-ab__text { text-transform: uppercase; }
+
+/* ---------- Regular + Carousel ---------- */
+.boostify-ab__track {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+  padding: var(--bab-pad) 20px;
+}
+.boostify-ab--rotate .boostify-ab__track { padding-left: 48px; padding-right: 48px; }
+.boostify-ab--dismissible .boostify-ab__track { padding-right: 48px; }
+.boostify-ab--rotate.boostify-ab--dismissible .boostify-ab__track { padding-right: 76px; }
+
+.boostify-ab--edge .boostify-ab__track {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%);
+}
+
+.boostify-ab__msg {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: var(--bab-align);
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  text-align: var(--bab-align);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+/* Changing messages is animated from script (see animateSwap), so a click reacts at once */
+.boostify-ab__msg.is-active,
+.boostify-ab__msg.is-leaving {
+  opacity: 1;
+  visibility: visible;
+}
+.boostify-ab__msg.is-active { pointer-events: auto; }
+
+/* Compact (the default): smaller button, arrows and gaps. Comes after the rules above so it wins. */
+.boostify-ab--compact .boostify-ab__btn { padding: 0.3em 0.9em; font-size: 0.84em; }
+.boostify-ab--compact .boostify-ab__nav { font-size: 22px; padding: 4px 10px; min-width: 30px; min-height: 30px; }
+.boostify-ab--compact .boostify-ab__close { font-size: 18px; }
+.boostify-ab--compact .boostify-ab__msg { gap: 4px 10px; }
+.boostify-ab--compact .boostify-ab__track { padding-left: 14px; padding-right: 14px; }
+.boostify-ab--compact.boostify-ab--rotate .boostify-ab__track { padding-left: 36px; padding-right: 36px; }
+.boostify-ab--compact.boostify-ab--dismissible .boostify-ab__track { padding-right: 36px; }
+.boostify-ab--compact.boostify-ab--rotate.boostify-ab--dismissible .boostify-ab__track { padding-right: 60px; }
+.boostify-ab--compact.boostify-ab--dismissible .boostify-ab__nav--next { right: 28px; }
+.boostify-ab--compact .boostify-ab__sep { padding: 0 16px; }
+.boostify-ab__text { color: inherit; text-decoration: none; }
+a.boostify-ab__text { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Moving line ---------- */
+.boostify-ab__marquee {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--bab-pad) 0;
+}
+.boostify-ab--edge .boostify-ab__marquee {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+}
+.boostify-ab--dismissible .boostify-ab__marquee { margin-right: 40px; }
+.boostify-ab__lane {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  will-change: transform;
+  animation: boostify-ab-scroll var(--bab-speed) linear infinite;
+}
+.boostify-ab:hover .boostify-ab__lane,
+.boostify-ab:focus-within .boostify-ab__lane { animation-play-state: paused; }
+.boostify-ab__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+.boostify-ab__sep {
+  display: inline-block;
+  padding: 0 22px;
+  color: var(--bab-accent);
+  white-space: nowrap;
+}
+@keyframes boostify-ab-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- Button ---------- */
+.boostify-ab__btn {
+  display: inline-block;
+  padding: 0.45em 1.15em;
+  border: 2px solid transparent;
+  border-radius: var(--bab-btn-radius);
+  background: var(--bab-btn-bg);
+  color: var(--bab-btn-text);
+  font-size: 0.9em;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.boostify-ab__btn:hover { transform: translateY(-1px); opacity: 0.92; }
+.boostify-ab--btn-outline .boostify-ab__btn {
+  background: transparent;
+  color: var(--bab-accent);
+  border-color: var(--bab-accent);
+}
+
+/* ---------- Arrows + close ---------- */
+.boostify-ab__nav,
+.boostify-ab__close {
+  position: absolute;
+  z-index: 2; /* stay above the edge-fade layer so clicks reach the arrows */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  padding: 4px 10px;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  font-family: inherit;
+  line-height: 1;
+}
+.boostify-ab__nav { font-size: 28px; }
+.boostify-ab__nav--prev { left: 6px; }
+.boostify-ab__nav--next { right: 6px; }
+.boostify-ab--dismissible .boostify-ab__nav--next { right: 36px; }
+.boostify-ab__close { right: 8px; font-size: 22px; }
+.boostify-ab__nav:hover,
+.boostify-ab__close:hover { opacity: 1; }
+
+@media (max-width: 600px) {
+  .boostify-ab { font-size: max(11px, calc(var(--bab-size) - 1px)); }
+  .boostify-ab__track { padding: calc(var(--bab-pad) - 2px) 16px; }
+  .boostify-ab--rotate .boostify-ab__track { padding-left: 34px; padding-right: 34px; }
+  .boostify-ab--dismissible .boostify-ab__track { padding-right: 38px; }
+  .boostify-ab--rotate.boostify-ab--dismissible .boostify-ab__track { padding-right: 56px; }
+  .boostify-ab__nav { padding: 4px 6px; }
+  .boostify-ab--compact .boostify-ab__nav { padding: 4px 8px; }
+  .boostify-ab__sep { padding: 0 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boostify-ab__lane { animation-duration: 120s; }
+}

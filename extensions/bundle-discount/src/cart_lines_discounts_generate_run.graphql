@@ -1,0 +1,36 @@
+query CartInput {
+  cart {
+    lines {
+      id
+      quantity
+      bundle: attribute(key: "_boostify_bundle") {
+        value
+      }
+      merchandise {
+        ... on ProductVariant {
+          product {
+            id
+          }
+        }
+      }
+    }
+  }
+  discount {
+    discountClasses
+    bundles: metafield(key: "bundles") {
+      jsonValue
+    }
+    bundles2: metafield(key: "bundles_2") {
+      jsonValue
+    }
+    bundles3: metafield(key: "bundles_3") {
+      jsonValue
+    }
+    bundles4: metafield(key: "bundles_4") {
+      jsonValue
+    }
+    smart: metafield(key: "smart") {
+      jsonValue
+    }
+  }
+}

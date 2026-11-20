@@ -1,0 +1,104 @@
+{%- assign cfg = app.metafields.boostify.sticky_atc.value -%}
+{%- if request.page_type == 'product' and cfg != blank and cfg.enabled == true and product != blank -%}
+  {%- assign current = product.selected_or_first_available_variant -%}
+  {%- liquid
+    case cfg.fontFamily
+      when 'serif'
+        assign font = 'Georgia, "Times New Roman", serif'
+      when 'mono'
+        assign font = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+      else
+        assign font = 'inherit'
+    endcase
+  -%}
+  <div
+    id="boostify-satc"
+    class="boostify-satc boostify-satc--{{ cfg.position | escape }}{% if cfg.boxed %} boostify-satc--boxed{% endif %}{% if cfg.shadow %} boostify-satc--shadow{% endif %}{% if cfg.border %} boostify-satc--border{% endif %}"
+    data-devices="{{ cfg.devices | escape }}"
+    data-appear="{{ cfg.appear | escape }}"
+    data-after-add="{{ cfg.afterAdd | escape }}"
+    data-added-text="{{ cfg.addedText | escape }}"
+    data-sold-out-text="{{ cfg.soldOutText | escape }}"
+    data-button-text="{{ cfg.buttonText | escape }}"
+    role="region"
+    aria-label="Quick add to cart"
+    style="
+      --satc-bg: {{ cfg.bg | escape }};
+      --satc-text: {{ cfg.textColor | escape }};
+      --satc-price: {{ cfg.priceColor | escape }};
+      --satc-compare: {{ cfg.compareColor | escape }};
+      --satc-btn-bg: {{ cfg.btnBg | escape }};
+      --satc-btn-text: {{ cfg.btnText | escape }};
+      --satc-btn-radius: {{ cfg.btnRadius | plus: 0 }}px;
+      --satc-radius: {{ cfg.radius | plus: 0 }}px;
+      --satc-inset: {{ cfg.inset | plus: 0 }}px;
+      --satc-size: {{ cfg.fontSize | plus: 0 }}px;
+      --satc-font: {{ font }};
+    "
+  >
+    <div class="boostify-satc__card">
+      {%- if cfg.showImage and product.featured_image -%}
+        <img
+          class="boostify-satc__img"
+          src="{{ current.featured_image | default: product.featured_image | image_url: width: 120 }}"
+          alt="{{ product.featured_image.alt | escape }}"
+          width="52"
+          height="52"
+          loading="lazy"
+        >
+      {%- endif -%}
+
+      <div class="boostify-satc__info">
+        {%- if cfg.showTitle -%}
+          <div class="boostify-satc__title">{{ product.title | escape }}</div>
+        {%- endif -%}
+        {%- if cfg.showPrice -%}
+          <div class="boostify-satc__price">
+            <span class="boostify-satc__now">{{ current.price | money }}</span>
+            {%- if cfg.showCompare -%}
+              <s class="boostify-satc__compare"{% unless current.compare_at_price > current.price %} hidden{% endunless %}>{{ current.compare_at_price | money }}</s>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="boostify-satc__controls">
+        {%- if cfg.showQuantity -%}
+          <div class="boostify-satc__qty">
+            <button type="button" class="boostify-satc__minus" aria-label="Decrease quantity">&minus;</button>
+            <input class="boostify-satc__qty-input" type="number" min="1" value="1" inputmode="numeric" aria-label="Quantity">
+            <button type="button" class="boostify-satc__plus" aria-label="Increase quantity">+</button>
+          </div>
+        {%- endif -%}
+
+        <button type="button" class="boostify-satc__btn">{{ cfg.buttonText | escape }}</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" id="boostify-satc-variants">
+    [
+      {%- for v in product.variants -%}
+        {
+          "id": {{ v.id }},
+          "price": {{ v.price | money | json }},
+          "compare": {% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | json }}{% else %}null{% endif %},
+          "available": {{ v.available | json }},
+          "image": {% if v.featured_image %}{{ v.featured_image | image_url: width: 120 | json }}{% else %}null{% endif %}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </script>
+  <script type="application/json" id="boostify-satc-current">{{ current.id | json }}</script>
+
+  {{ 'sticky-cart.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'sticky-cart.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Sticky Cart",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

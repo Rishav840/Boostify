@@ -1,0 +1,21 @@
+{%- assign cfg = app.metafields.boostify.bundles.value -%}
+{%- if cfg != blank and cfg.enabled == true and product != blank -%}
+  <div class="boostify-bd-slot" {{ block.shopify_attributes }}>
+    {% render 'boostify-bundle', cfg: cfg, product: product, auto: false %}
+  </div>
+  {{ 'bundle.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'bundle.js' | asset_url }}" defer></script>
+{%- elsif request.design_mode -%}
+  <div {{ block.shopify_attributes }} style="padding:12px;text-align:center;font-size:14px;">
+    Turn on Product Bundles in the Boostify app and add a bundle with this product first.
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Bundle",
+  "target": "section",
+  "enabled_on": { "templates": ["product"] },
+  "settings": []
+}
+{% endschema %}

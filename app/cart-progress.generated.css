@@ -1,0 +1,260 @@
+.boostify-cp-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0;
+  position: relative;
+  z-index: 40;
+}
+.boostify-cp-wrap--drawer { padding: 4px 20px 6px; padding-left: 0;}
+.boostify-cp-wrap--cart { padding: 0 0 20px; }
+/* On an empty cart page the bar is not inside the theme's page container, so give it margins */
+.boostify-cp-wrap--standalone { max-width: 1200px; margin: 24px auto 0; padding: 0 20px 8px; }
+
+/* Flat by default: no card, no background, no border, square corners */
+.boostify-cp {
+  --cp-bg: transparent;
+  --cp-text: #111111;
+  --cp-fill: #111111;
+  --cp-fill2: #111111;
+  --cp-track: #e5e7eb;
+  --cp-marker-bg: #ffffff;
+  --cp-radius: 0px;
+  --cp-bar-radius: 0px;
+  --cp-marker-radius: 50%;
+  --cp-marker-size: 22px;
+  --cp-msg-gap: 10px;
+  --cp-amount-space: calc(var(--cp-marker-size) / 2 + 17px);
+  --cp-label-space: calc(var(--cp-marker-size) / 2 + 20px);
+  --cp-height: 6px;
+  --cp-font: inherit;
+  --cp-size: 13px;
+  --cp-weight: 600;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 0 6px;
+  border-radius: var(--cp-radius);
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  font-family: var(--cp-font);
+  font-size: var(--cp-size);
+  line-height: 1.35;
+}
+.boostify-cp[hidden] { display: none; }
+.boostify-cp--solid { padding: 10px 12px 12px; }
+.boostify-cp--border { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.boostify-cp--shadow { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14); }
+.boostify-cp--border.boostify-cp--shadow {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 6px 20px rgba(0, 0, 0, 0.14);
+}
+.boostify-cp--divider { border-bottom: 1px solid rgba(0, 0, 0, 0.12); }
+
+/* Roomy: more breathing space, for stores that want a bigger bar */
+.boostify-cp--roomy {
+  --cp-msg-gap: 14px;
+  --cp-amount-space: calc(var(--cp-marker-size) / 2 + 30px);
+  --cp-label-space: calc(var(--cp-marker-size) / 2 + 28px);
+  padding: 10px 0 14px;
+}
+.boostify-cp--roomy .boostify-cp__amount { bottom: calc(100% + 6px); font-size: 0.85em; }
+.boostify-cp--roomy .boostify-cp__label { top: calc(100% + 6px); font-size: 0.82em; }
+
+.boostify-cp__msg {
+  margin: 0 0 var(--cp-msg-gap);
+  text-align: center;
+  font-weight: var(--cp-weight);
+}
+
+/* The rail holds the track plus the goal markers placed along it */
+.boostify-cp__rail {
+  position: relative;
+  margin: 6px calc(var(--cp-marker-size) / 2 + 10px) 0;
+}
+.boostify-cp--amounts .boostify-cp__rail { margin-top: var(--cp-amount-space); }
+.boostify-cp--labels .boostify-cp__rail { margin-bottom: var(--cp-label-space); margin-left: 0;}
+
+.boostify-cp__track {
+  height: var(--cp-height);
+  border-radius: var(--cp-bar-radius);
+  background: var(--cp-track);
+  overflow: hidden;
+}
+/* `.boostify-cp ` prefix beats themes that hide empty elements with `div:empty { display: none }` */
+.boostify-cp .boostify-cp__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: var(--cp-bar-radius);
+  background: linear-gradient(90deg, var(--cp-fill), var(--cp-fill2));
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.boostify-cp__marker {
+  position: absolute;
+  top: calc(var(--cp-height) / 2);
+  transform: translate(-50%, -50%);
+}
+.boostify-cp__dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--cp-marker-size);
+  height: var(--cp-marker-size);
+  box-sizing: border-box;
+  border: 2px solid var(--cp-track);
+  border-radius: var(--cp-marker-radius);
+  background: var(--cp-marker-bg);
+  font-size: calc(var(--cp-marker-size) * 0.5);
+  line-height: 1;
+  overflow: visible;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.boostify-cp .boostify-cp__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--cp-marker-radius);
+  object-fit: cover;
+}
+.boostify-cp__marker.is-reached .boostify-cp__dot { border-color: var(--cp-fill); }
+/* A small check badge shows a goal is unlocked, while the icon you chose stays visible */
+.boostify-cp__marker.is-reached .boostify-cp__dot::after {
+  content: "\2713";
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  display: grid;
+  place-items: center;
+  width: 11px;
+  height: 11px;
+  border-radius: var(--cp-marker-radius);
+  background: var(--cp-fill);
+  color: #fff;
+  font-size: 7px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Amount shown above each marker, e.g. ₹2,499.00 */
+.boostify-cp .boostify-cp__amount {
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8em;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.boostify-cp__label {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: var(--cp-label-w, 96px);
+  text-align: center;
+  font-size: 0.78em;
+  line-height: 1.2;
+  opacity: 0.85;
+}
+.boostify-cp__marker.is-reached .boostify-cp__label { opacity: 1; font-weight: 600; }
+
+.boostify-cp.is-celebrate .boostify-cp__msg { animation: boostify-cp-pop 0.7s ease; }
+.boostify-cp.is-celebrate .boostify-cp__marker.is-reached .boostify-cp__dot { animation: boostify-cp-pop 0.7s ease; }
+@keyframes boostify-cp-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Clean style (default): soft markers that sit in a gap in the bar, tooltips ---------- */
+.boostify-cp__msg strong { font-weight: 700; }
+.boostify-cp--clean .boostify-cp__msg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 4px;
+}
+.boostify-cp .boostify-cp__msg-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.35em;
+  height: 1.35em;
+  margin-right: 2px;
+  line-height: 1;
+}
+.boostify-cp .boostify-cp__svg { display: block; width: 58%; height: 58%; }
+.boostify-cp .boostify-cp__msg-icon .boostify-cp__svg { width: 100%; height: 100%; }
+.boostify-cp .boostify-cp__msg-icon .boostify-cp__img { width: 100%; height: 100%; border-radius: 3px; }
+
+/* flush with the content on the left; room for the last marker on the right */
+.boostify-cp--clean .boostify-cp__rail { margin-left: 0; margin-right: calc(var(--cp-marker-size) / 2); }
+.boostify-cp--clean:not(.boostify-cp--amounts) .boostify-cp__rail { margin-top: calc(var(--cp-marker-size) / 2 - var(--cp-height) / 2 + 4px); }
+.boostify-cp--clean:not(.boostify-cp--labels) .boostify-cp__rail { margin-bottom: calc(var(--cp-marker-size) / 2 - var(--cp-height) / 2 + 2px); }
+.boostify-cp--clean .boostify-cp__dot {
+  border: 0;
+  background: var(--cp-marker-bg);
+  color: var(--cp-icon);
+  /* the ring in the cart's background colour is what makes the gap in the bar */
+  box-shadow: 0 0 0 4px var(--cp-gap);
+}
+.boostify-cp--clean .boostify-cp__marker.is-reached .boostify-cp__dot { background: var(--cp-fill); color: #ffffff; }
+.boostify-cp--clean .boostify-cp__marker.is-reached .boostify-cp__dot::after { display: none; }
+
+/* ---------- Tooltip (hover, tap or keyboard focus on a marker) ---------- */
+.boostify-cp__marker[tabindex] { cursor: default; outline: none; }
+.boostify-cp__marker[tabindex]:focus-visible .boostify-cp__dot { outline: 2px solid var(--cp-fill); outline-offset: 5px; }
+.boostify-cp .boostify-cp__tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 5;
+  transform: translate(-50%, 4px);
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+.boostify-cp .boostify-cp__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-top-color: #111111;
+}
+.boostify-cp__marker:hover .boostify-cp__tip,
+.boostify-cp__marker:focus .boostify-cp__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition-delay: 0s;
+}
+/* near the edges the tooltip lines up with the marker instead of hanging over the side */
+.boostify-cp .boostify-cp__marker.is-start .boostify-cp__tip { left: -8px; transform: translateY(4px); }
+.boostify-cp .boostify-cp__marker.is-start .boostify-cp__tip::after { left: calc(var(--cp-marker-size) / 2 + 8px); }
+.boostify-cp .boostify-cp__marker.is-end .boostify-cp__tip { left: auto; right: -8px; transform: translateY(4px); }
+.boostify-cp .boostify-cp__marker.is-end .boostify-cp__tip::after { left: auto; right: calc(var(--cp-marker-size) / 2 + 3px); }
+.boostify-cp .boostify-cp__marker.is-start:hover .boostify-cp__tip,
+.boostify-cp .boostify-cp__marker.is-start:focus .boostify-cp__tip,
+.boostify-cp .boostify-cp__marker.is-end:hover .boostify-cp__tip,
+.boostify-cp .boostify-cp__marker.is-end:focus .boostify-cp__tip { transform: translateY(0); }
+
+@media (max-width: 600px) {
+  .boostify-cp__rail { margin-left: calc(var(--cp-marker-size) / 2 + 8px); margin-right: calc(var(--cp-marker-size) / 2 + 8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boostify-cp__fill { transition: none; }
+  .boostify-cp .boostify-cp__tip { transition: none; }
+  .boostify-cp.is-celebrate .boostify-cp__msg,
+  .boostify-cp.is-celebrate .boostify-cp__marker.is-reached .boostify-cp__dot { animation: none; }
+}

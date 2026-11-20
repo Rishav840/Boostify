@@ -1,0 +1,14 @@
+{%- assign cfg = app.metafields.boostify.countdown.value -%}
+{%- if cfg != blank -%}
+  <script type="application/json" data-boostify-cd data-mode="embed" data-page="{{ request.page_type }}">{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'countdown.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'countdown.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Countdown",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

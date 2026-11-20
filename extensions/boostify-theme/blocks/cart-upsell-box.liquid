@@ -1,0 +1,24 @@
+{%- assign cfg = app.metafields.boostify.cart_upsell.value -%}
+{%- if cfg != blank and cfg.enabled == true -%}
+  <div class="boostify-up-slot" {{ block.shopify_attributes }}></div>
+  <script
+    type="application/json"
+    data-boostify-up
+    data-money-format="{{ shop.money_format | escape }}"
+    data-shop-currency="{{ shop.currency }}"
+  >{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'cart-upsell.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'cart-upsell.js' | asset_url }}" defer></script>
+{%- elsif request.design_mode -%}
+  <div {{ block.shopify_attributes }} style="padding:12px;text-align:center;font-size:14px;">
+    Turn on Cart Recommendations in the Boostify app first.
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Recommendations",
+  "target": "section",
+  "settings": []
+}
+{% endschema %}

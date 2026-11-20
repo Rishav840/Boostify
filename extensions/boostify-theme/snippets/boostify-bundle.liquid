@@ -1,0 +1,162 @@
+{%- comment -%}
+  The first enabled bundle that contains `product`, with `product` listed first. Without one, and
+  with smart bundles on, a smart bundle: `product` here, Shopify's recommendations added by bundle.js.
+  Params: cfg (app.metafields.boostify.bundles.value), product, auto (true = placed by the script)
+{%- endcomment -%}
+{%- liquid
+  assign bundle = blank
+  for b in cfg.bundles
+    if b.enabled == false or b.products.size < 2
+      continue
+    endif
+    for p in b.products
+      if p.id == product.id
+        assign bundle = b
+        break
+      endif
+    endfor
+    if bundle != blank
+      break
+    endif
+  endfor
+
+  assign smart = false
+  if bundle == blank and cfg.smartEnabled == true
+    assign smart = true
+  endif
+-%}
+{%- if bundle != blank or smart -%}
+  {%- liquid
+    assign handles = product.handle
+    if smart
+      assign bundle_id = 'smart'
+      assign percent = cfg.smartPercent | plus: 0
+    else
+      assign bundle_id = bundle.id
+      assign percent = bundle.percent | plus: 0
+      for p in bundle.products
+        if p.id != product.id
+          assign handles = handles | append: ',' | append: p.handle
+        endif
+      endfor
+    endif
+    assign handles = handles | split: ','
+
+    case cfg.fontFamily
+      when 'serif'
+        assign font = 'Georgia, "Times New Roman", serif'
+      when 'mono'
+        assign font = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+      else
+        assign font = 'inherit'
+    endcase
+  -%}
+  <div
+    class="boostify-bd{% if cfg.border %} boostify-bd--border{% endif %}{% if cfg.checkboxes %} boostify-bd--checks{% endif %}"
+    data-bundle="{{ bundle_id | escape }}"
+    data-percent="{{ percent }}"
+    {% if smart %}data-smart="1" data-product-id="{{ product.id }}" data-show-plus="{% if cfg.showPlus %}1{% endif %}" data-min="{{ cfg.smartMin | default: 3 }}"{% if cfg.smartBuilder %} data-builder="1" data-more-heading="{{ cfg.moreHeading | escape }}" data-hint="{{ cfg.builderHint | escape }}"{% endif %}{% endif %}
+    data-auto="{% if auto %}1{% endif %}"
+    data-position="{{ cfg.position | escape }}"
+    data-after-add="{{ cfg.afterAdd | escape }}"
+    data-added-text="{{ cfg.addedText | escape }}"
+    data-button-text="{{ cfg.buttonText | escape }}"
+    data-sold-out-text="{{ cfg.soldOutText | escape }}"
+    data-savings-text="{{ cfg.savingsText | escape }}"
+    data-show-compare="{% if cfg.showCompare %}1{% endif %}"
+    data-checkboxes="{% if cfg.checkboxes %}1{% endif %}"
+    data-money-format="{{ shop.money_format | escape }}"
+    data-shop-currency="{{ shop.currency }}"
+    {% if auto or smart %}hidden{% endif %}
+    style="
+      --bd-bg: {{ cfg.bg | escape }};
+      --bd-text: {{ cfg.textColor | escape }};
+      --bd-price: {{ cfg.priceColor | escape }};
+      --bd-compare: {{ cfg.compareColor | escape }};
+      --bd-btn-bg: {{ cfg.btnBg | escape }};
+      --bd-btn-text: {{ cfg.btnText | escape }};
+      --bd-badge-bg: {{ cfg.badgeBg | escape }};
+      --bd-badge-text: {{ cfg.badgeText | escape }};
+      --bd-radius: {{ cfg.radius | plus: 0 }}px;
+      --bd-btn-radius: {{ cfg.btnRadius | plus: 0 }}px;
+      --bd-size: {{ cfg.fontSize | plus: 0 }}px;
+      --bd-font: {{ font }};
+    "
+  >
+    {%- if cfg.heading != blank -%}
+      <p class="boostify-bd__heading">{{ cfg.heading | escape }}</p>
+    {%- endif -%}
+
+    <div class="boostify-bd__items">
+      {%- for h in handles -%}
+        {%- liquid
+          if h == product.handle
+            assign item = product
+            assign selected = product.selected_or_first_available_variant
+          else
+            assign item = all_products[h]
+            assign selected = item.first_available_variant | default: item.selected_or_first_available_variant
+          endif
+        -%}
+        {%- if item == blank or item.id == nil -%}{%- continue -%}{%- endif -%}
+        {%- if cfg.showPlus and forloop.first == false -%}
+          <div class="boostify-bd__plus" aria-hidden="true">+</div>
+        {%- endif -%}
+        <div class="boostify-bd__item" data-product="{{ item.id }}">
+          {%- if item.featured_image -%}
+            <img
+              class="boostify-bd__img"
+              src="{{ selected.featured_image | default: item.featured_image | image_url: width: 160 }}"
+              alt="{{ item.featured_image.alt | default: item.title | escape }}"
+              width="64"
+              height="64"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="boostify-bd__img" aria-hidden="true"></div>
+          {%- endif -%}
+          <div class="boostify-bd__info">
+            <a class="boostify-bd__title" href="{{ item.url }}">{{ item.title | escape }}</a>
+            <div class="boostify-bd__price">
+              <span class="boostify-bd__now">{{ selected.price | money }}</span>
+              {%- if cfg.showCompare -%}
+                <s class="boostify-bd__compare"{% unless selected.compare_at_price > selected.price %} hidden{% endunless %}>{{ selected.compare_at_price | money }}</s>
+              {%- endif -%}
+            </div>
+            {%- unless item.has_only_default_variant -%}
+              <select class="boostify-bd__variant" aria-label="{{ item.title | escape }}">
+                {%- for v in item.variants -%}
+                  <option value="{{ v.id }}"{% if v.id == selected.id %} selected{% endif %}{% unless v.available %} disabled{% endunless %}>{{ v.title | escape }}</option>
+                {%- endfor -%}
+              </select>
+            {%- endunless -%}
+          </div>
+          <script type="application/json" class="boostify-bd__data">
+            [
+              {%- for v in item.variants -%}
+                {
+                  "id": {{ v.id }},
+                  "price": {{ v.price }},
+                  "compare": {% if v.compare_at_price > v.price %}{{ v.compare_at_price }}{% else %}null{% endif %},
+                  "available": {{ v.available | json }},
+                  "image": {% if v.featured_image %}{{ v.featured_image | image_url: width: 160 | json }}{% else %}null{% endif %}
+                }{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+            ]
+          </script>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <div class="boostify-bd__footer">
+      <div class="boostify-bd__total">
+        {%- if cfg.totalLabel != blank -%}<span class="boostify-bd__label">{{ cfg.totalLabel | escape }}</span>{%- endif -%}
+        <strong class="boostify-bd__sum"></strong>
+        <s class="boostify-bd__was" hidden></s>
+        <span class="boostify-bd__badge" hidden></span>
+      </div>
+      <button type="button" class="boostify-bd__btn">{{ cfg.buttonText | escape }}</button>
+      <p class="boostify-bd__error" role="alert" hidden></p>
+    </div>
+  </div>
+{%- endif -%}

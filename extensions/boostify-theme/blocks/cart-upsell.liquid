@@ -1,0 +1,19 @@
+{%- assign cfg = app.metafields.boostify.cart_upsell.value -%}
+{%- if cfg != blank and cfg.enabled == true -%}
+  <script
+    type="application/json"
+    data-boostify-up
+    data-money-format="{{ shop.money_format | escape }}"
+    data-shop-currency="{{ shop.currency }}"
+  >{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'cart-upsell.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'cart-upsell.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Cart Upsell",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

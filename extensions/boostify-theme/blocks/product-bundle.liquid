@@ -1,0 +1,14 @@
+{%- assign cfg = app.metafields.boostify.bundles.value -%}
+{%- if request.page_type == 'product' and cfg != blank and cfg.enabled == true and product != blank -%}
+  {% render 'boostify-bundle', cfg: cfg, product: product, auto: true %}
+  {{ 'bundle.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'bundle.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Bundles",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

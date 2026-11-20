@@ -1,0 +1,20 @@
+{%- assign cfg = app.metafields.boostify.cart_progress.value -%}
+{%- if cfg != blank and cfg.enabled == true -%}
+  <script
+    type="application/json"
+    data-boostify-cp
+    data-total="{{ cart.total_price }}"
+    data-money-format="{{ shop.money_format | escape }}"
+    data-shop-currency="{{ shop.currency }}"
+  >{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'cart-progress.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'cart-progress.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Cart Progress",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

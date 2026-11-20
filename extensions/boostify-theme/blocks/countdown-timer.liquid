@@ -1,0 +1,34 @@
+{%- assign cfg = app.metafields.boostify.countdown.value -%}
+{%- if cfg != blank -%}
+  <div class="boostify-cd-slot" data-slot="{{ block.settings.timer }}" {{ block.shopify_attributes }}></div>
+  <script type="application/json" data-boostify-cd data-page="{{ request.page_type }}">{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'countdown.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'countdown.js' | asset_url }}" defer></script>
+{%- else -%}
+  <div {{ block.shopify_attributes }} style="padding:12px;text-align:center;font-size:14px;">
+    Create a timer in the Boostify app first.
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Timer",
+  "target": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "timer",
+      "label": "Which timer to show",
+      "info": "Timers are numbered in the Boostify app (Timer #1, #2…). The timer must be turned on there.",
+      "default": "1",
+      "options": [
+        { "value": "1", "label": "Timer #1" },
+        { "value": "2", "label": "Timer #2" },
+        { "value": "3", "label": "Timer #3" },
+        { "value": "4", "label": "Timer #4" },
+        { "value": "5", "label": "Timer #5" }
+      ]
+    }
+  ]
+}
+{% endschema %}

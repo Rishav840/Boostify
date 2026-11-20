@@ -1,0 +1,34 @@
+{%- assign cfg = app.metafields.boostify.announcement.value -%}
+{%- if cfg != blank -%}
+  <div class="boostify-ab-slot" data-slot="{{ block.settings.bar }}" {{ block.shopify_attributes }}></div>
+  <script type="application/json" data-boostify-config data-page="{{ request.page_type }}">{{ cfg | json | replace: '<', '\u003c' }}</script>
+  {{ 'announcement-bar.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'announcement-bar.js' | asset_url }}" defer></script>
+{%- else -%}
+  <div {{ block.shopify_attributes }} style="padding:12px;text-align:center;font-size:14px;">
+    Open the Boostify app and create a bar first.
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Boostify Bar",
+  "target": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "bar",
+      "label": "Which bar to show",
+      "info": "Bars are numbered in the Boostify app (Bar #1, #2…). The bar must be turned on there.",
+      "default": "1",
+      "options": [
+        { "value": "1", "label": "Bar #1" },
+        { "value": "2", "label": "Bar #2" },
+        { "value": "3", "label": "Bar #3" },
+        { "value": "4", "label": "Bar #4" },
+        { "value": "5", "label": "Bar #5" }
+      ]
+    }
+  ]
+}
+{% endschema %}
